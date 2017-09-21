@@ -58,15 +58,16 @@ void *mem_alloc(const size_t size) {
 	memBlock_header *curr_block = (memBlock_header*)heap;
 	int alignedSize = size + BLOCK_ALIGNMENT - size % BLOCK_ALIGNMENT;
 
-	do {
+	while (true) {
 		if (curr_block->blockStatus == BlockStatus::free && curr_block->size >= alignedSize)
 			isFound = true;
 		else {
 			prev_block_size = curr_block->size;
-			curr_block = (memBlock_header*)((unsigned char*)(curr_block + 1) + alignedSize);
+			if (!isFound && &heap[HEAP_SIZE - 1] - (unsigned char*)(curr_block + 1) + 1 >= alignedSize)
+				curr_block = (memBlock_header*)((unsigned char*)(curr_block + 1) + alignedSize);
+			else break;
 		}
-	//till there still could be enough free space to allocate
-	} while (!isFound && &heap[HEAP_SIZE-1] - (unsigned char*)(curr_block+1) + 1 >= alignedSize);
+	}
 	
 	if (!isFound)
 		return nullptr;
