@@ -5,10 +5,10 @@ enum class BlockStatus {
 	used
 };
 
-struct mem_header {
+struct memBlock_header {
 	BlockStatus blockStatus;
-	size_t block_size;
-	size_t prev_block_size;
+	size_t size;
+	size_t prev_size;
 };
 
 void printHeap();

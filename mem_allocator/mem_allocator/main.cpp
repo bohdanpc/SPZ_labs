@@ -9,5 +9,7 @@ int main() {
 
 	//(unsigned char* (block = 3;
 	printHeap();
+
+	std::cout << std::endl << std::endl << sizeof(memBlock_header) << std::endl;
 	return 0;
 }
