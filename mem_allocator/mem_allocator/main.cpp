@@ -2,8 +2,8 @@
 #include "mem_allocator.h"
 
 int main() {
-	void *block = mem_alloc(23);
-	void *block2 = mem_alloc(15);
+	void *block = mem_alloc(20);
+	void *block2 = mem_alloc(10);
 
 	((unsigned char*)block)[0] = 15;
 	((unsigned char*)block)[1] = 16;
