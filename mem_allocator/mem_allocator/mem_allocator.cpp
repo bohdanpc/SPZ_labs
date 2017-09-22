@@ -66,8 +66,6 @@ void *mem_alloc(const size_t size) {
 
 void mem_free(void *block) {
 	if (block) {
-		bool rightBlockTry = true;
-
 		memBlock_header *curr_head = (memBlock_header *)block - 1;
 		memBlock_header *prev_head, *next_head;
 
