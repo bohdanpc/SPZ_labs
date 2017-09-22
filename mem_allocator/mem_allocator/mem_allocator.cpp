@@ -63,14 +63,36 @@ void *mem_alloc(const size_t size) {
 	return (void*)(curr_block + 1);
 }
 
-void mem_free(void *block) {
 
+void mem_free(void *block) {
+	if (block) {
+		bool rightBlockTry = true;
+
+		memBlock_header *curr_head = (memBlock_header *)block - 1;
+		memBlock_header *prev_head, *next_head;
+
+		curr_head->blockStatus = BlockStatus::free;
+
+		while (curr_head->prev_size) {
+			prev_head = (memBlock_header *)((unsigned char *)curr_head - curr_head->prev_size) - 1;
+			prev_head->size += curr_head->size + sizeof(memBlock_header);
+			curr_head = prev_head;
+		}
+
+		//RIGHT BLOCK
+		/*if (rightBlockTry && &heap[HEAP_SIZE - 1] - (unsigned char*)(curr_head + 1) - curr_head->size + 1 > 0)
+			next_head = (memBlock_header *)((unsigned char *)curr_head + curr_head->size) + 1;
+		else
+			rightBlockTry = false;*/
+
+
+	}
 }
+
 
 void *mem_realloc(void *block, const size_t new_size) {
 	return nullptr;
 }
-
 
 
 void printHeap() {

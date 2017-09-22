@@ -2,23 +2,30 @@
 #include "mem_allocator.h"
 
 int main() {
-	void *block = mem_alloc(20);
-	void *block2 = mem_alloc(10);
+	void *block0 = mem_alloc(20);
+	void *block1 = mem_alloc(10);
+	void *block2 = mem_alloc(17);
 
-	((unsigned char*)block)[0] = 15;
-	((unsigned char*)block)[1] = 16;
-	((unsigned char*)block)[2] = 17;
+	((unsigned char*)block0)[0] = 15;
+	((unsigned char*)block0)[1] = 16;
+	((unsigned char*)block0)[2] = 17;
 
-	((unsigned char*)block2)[0] = 25;
-	((unsigned char*)block2)[1] = 26;
-	((unsigned char*)block2)[2] = 27;
-
-	//(unsigned char* (block = 3;
-	printHeap();
+	((unsigned char*)block1)[0] = 25;
+	((unsigned char*)block1)[1] = 26;
+	((unsigned char*)block1)[2] = 27;
 
 	std::cout << "Heap traverse: \n\n";
 	traverseHeap();
 
-	std::cout << std::endl << std::endl << sizeof(memBlock_header) << std::endl;
+	mem_free(block0);
+
+	std::cout << "Heap traverse: \n\n";
+	traverseHeap();
+
+	mem_free(block1);
+
+	std::cout << "Heap traverse: \n\n";
+	traverseHeap();
+
 	return 0;
 }
