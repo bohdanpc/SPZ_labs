@@ -71,6 +71,9 @@ void mem_free(void *block) {
 		memBlock_header *curr_head = (memBlock_header *)block - 1;
 		memBlock_header *prev_head, *next_head;
 
+		if (curr_head->blockStatus == BlockStatus::free)
+			return;
+
 		//try to get left block
 		if (curr_head->prev_size) 
 			prev_head = (memBlock_header *)((unsigned char *)curr_head - curr_head->prev_size) - 1;
@@ -139,4 +142,15 @@ void traverseHeap() {
 		else
 			break;
 	}
+}
+
+void *getBlockById(const size_t id) {
+	memBlock_header *curr_block = (memBlock_header*)heap;
+	for (int i = 0; i < id; i++) {
+		if (&heap[HEAP_SIZE - 1] - (unsigned char*)(curr_block + 1) - curr_block->size + 1 > 0)
+			curr_block = (memBlock_header*)((unsigned char*)(curr_block + 1) + curr_block->size);
+		else
+			return nullptr;
+	}
+	return (void*)(curr_block + 1);
 }

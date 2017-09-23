@@ -13,6 +13,7 @@ struct memBlock_header {
 
 void printHeap();
 void traverseHeap();
+void *getBlockById(const size_t id);
 
 void *mem_alloc(const size_t size);
 void mem_free(void *mem_block);
