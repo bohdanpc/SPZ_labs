@@ -1,5 +1,6 @@
 #include <iostream>
 #include "mem_allocator.h"
+#include "userInterface.h"
 
 int main() {
 	void *block0 = mem_alloc(20);
@@ -19,13 +20,14 @@ int main() {
 
 	mem_free(block0);
 
-	std::cout << "Heap traverse: \n\n";
+	std::cout << "\n\nHeap traverse: \n\n";
 	traverseHeap();
 
 	mem_free(block1);
 
-	std::cout << "Heap traverse: \n\n";
+	std::cout << "\n\nHeap traverse: \n\n";
 	traverseHeap();
 
+	menu_main();
 	return 0;
 }

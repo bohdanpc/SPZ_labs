@@ -32,7 +32,7 @@ void *mem_alloc(const size_t size) {
 	bool isFound = false;
 	int prev_block_size = 0;
 	memBlock_header *curr_block = (memBlock_header*)heap;
-	int alignedSize = size;
+	size_t alignedSize = size;
 	if (alignedSize % BLOCK_ALIGNMENT != 0)
 	alignedSize += BLOCK_ALIGNMENT - alignedSize % BLOCK_ALIGNMENT;
 
@@ -48,16 +48,18 @@ void *mem_alloc(const size_t size) {
 	if (!isFound)
 		return nullptr;
 
-	//try to break one block in 2 (one will be returned and smaller one will be set as free)
-	if (curr_block->size >= BLOCK_ALIGNMENT + sizeof(memBlock_header)) {
+	//try to break one block in 2 (one will be returned and next one will be set as free)
+	if (curr_block->size > alignedSize + sizeof(memBlock_header)) {
 		auto next_block = (memBlock_header*)((unsigned char*)(curr_block + 1) + alignedSize);
 		next_block->blockStatus = BlockStatus::free;
 		next_block->prev_size = alignedSize;
 		next_block->size = curr_block->size - alignedSize - sizeof(memBlock_header);
 	}
-
-	curr_block->blockStatus = BlockStatus::used;
+	else if (curr_block->size == alignedSize + sizeof(memBlock_header)) //if free space equal to memHeader size
+		alignedSize += sizeof(memBlock_header);							//then there's no need to have block with size==0
+		
 	curr_block->size = alignedSize;
+	curr_block->blockStatus = BlockStatus::used;
 	curr_block->prev_size = prev_block_size;
 	
 	return (void*)(curr_block + 1);
@@ -69,21 +71,33 @@ void mem_free(void *block) {
 		memBlock_header *curr_head = (memBlock_header *)block - 1;
 		memBlock_header *prev_head, *next_head;
 
+		//try to get left block
+		if (curr_head->prev_size) 
+			prev_head = (memBlock_header *)((unsigned char *)curr_head - curr_head->prev_size) - 1;
+		else
+			prev_head = nullptr;
+
+		//try to get right block
+		if (&heap[HEAP_SIZE - 1] - (unsigned char*)(curr_head + 1) - curr_head->size + 1 > 0)
+			next_head = (memBlock_header*)((unsigned char*)(curr_head + 1) + curr_head->size);
+		else
+			next_head = nullptr;
+
 		curr_head->blockStatus = BlockStatus::free;
 
-		while (curr_head->prev_size) {
-			prev_head = (memBlock_header *)((unsigned char *)curr_head - curr_head->prev_size) - 1;
+		//unite current and left block
+		if (prev_head && prev_head->blockStatus == BlockStatus::free) {
 			prev_head->size += curr_head->size + sizeof(memBlock_header);
 			curr_head = prev_head;
+			if (next_head) {
+				next_head->prev_size = curr_head->size;
+			}
 		}
 
-		//RIGHT BLOCK
-		/*if (rightBlockTry && &heap[HEAP_SIZE - 1] - (unsigned char*)(curr_head + 1) - curr_head->size + 1 > 0)
-			next_head = (memBlock_header *)((unsigned char *)curr_head + curr_head->size) + 1;
-		else
-			rightBlockTry = false;*/
-
-
+		//unite current and right block
+		if (next_head && next_head->blockStatus == BlockStatus::free) {
+			curr_head->size += next_head->size + sizeof(memBlock_header);
+		}
 	}
 }
 
