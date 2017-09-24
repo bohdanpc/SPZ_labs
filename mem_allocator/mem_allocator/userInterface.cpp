@@ -1,56 +1,21 @@
 #include "userInterface.h"
 #include <iostream>
 #include <string>
-#include <map>
 
-using std::map;
 using std::string;
 using std::cout;
 using std::cin;
 using std::endl;
 
-static map<int, void*> IdToMemBlock;
-
-
-
-void menu_allocate() {
-	string  strBlockSize;
-	size_t blockSize;
-
-	do {
-		cout << "Enter block size: ";
-		cin >> strBlockSize;
-		try {
-			blockSize = stoi(strBlockSize);
-			break;
-		}
-		catch (std::invalid_argument &) {
-			std::cout << "Invalid size!\n";
-		}
-		catch (std::out_of_range) {
-			std::cout << "Value is out of range!\n";
-		}
-
-	} while (true);
-
-	mem_alloc(blockSize);
-}
-
-
-void menu_traverse() { 
-	traverseHeap();
-};
-
-
-void menu_free() {
-	string  strBlockSize;
-	size_t blockSize;
+const int readBlockId() {
+	string  strBlockId;
+	int blockId;
 
 	do {
 		cout << "Enter block id: ";
-		cin >> strBlockSize;
+		cin >> strBlockId;
 		try {
-			blockSize = stoi(strBlockSize);
+			blockId = stoi(strBlockId);
 			break;
 		}
 		catch (std::invalid_argument &) {
@@ -61,8 +26,49 @@ void menu_free() {
 		}
 
 	} while (true);
+	return blockId;
+}
 
-	void *block = getBlockById(blockSize);
+
+const int readBlockSize() {
+	string  strBlockSize;
+	int blockSize;
+
+	do {
+		cout << "Enter block size: ";
+		cin >> strBlockSize;
+		try {
+			blockSize = stoi(strBlockSize);
+			break;
+		}
+		catch (std::invalid_argument &) {
+			std::cout << "Invalid size!\n\n";
+		}
+		catch (std::out_of_range) {
+			std::cout << "Value is out of range!\n\n";
+		}
+
+	} while (true);
+	return blockSize;
+}
+
+
+void menu_allocate() {
+	
+	if (mem_alloc(readBlockSize()))
+		cout << "Success!\n\n";
+	else
+		cout << "Not enough free space!\n\n";
+}
+
+
+void menu_traverse() { 
+	traverseHeap();
+};
+
+
+void menu_free() {
+	void *block = getBlockById(readBlockId());
 	if (block) {
 		mem_free(block);
 		cout << "Success!\n";
@@ -72,7 +78,17 @@ void menu_free() {
 };
 
 void menu_realloc() {
+	void *block = getBlockById(readBlockId());
 
+	if (block) {
+		void *newBlock = mem_realloc(block, readBlockSize());
+		if (newBlock != block)
+			cout << "Success!\n";
+		else
+			cout << "Not enough memory to reallocate block\n";
+	}
+	else
+		std::cout << "Block wasn't found!\n";
 };
 
 
@@ -94,7 +110,6 @@ void menu_main() {
 
 		cout << "Enter: ";
 		cin >> choice;
-		cout << endl;
 		if (choice == "1")
 			menu_traverse();
 		else if (choice == "2")

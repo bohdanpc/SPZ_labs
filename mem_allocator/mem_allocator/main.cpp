@@ -3,7 +3,7 @@
 #include "userInterface.h"
 
 int main() {
-	void *block0 = mem_alloc(20);
+	/*void *block0 = mem_alloc(20);
 	void *block1 = mem_alloc(10);
 	void *block2 = mem_alloc(17);
 
@@ -26,7 +26,7 @@ int main() {
 	mem_free(block1);
 
 	std::cout << "\n\nHeap traverse: \n\n";
-	traverseHeap();
+	traverseHeap();*/
 
 	menu_main();
 	return 0;

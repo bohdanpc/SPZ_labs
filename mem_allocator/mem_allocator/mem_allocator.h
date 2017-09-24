@@ -7,15 +7,15 @@ enum class BlockStatus {
 
 struct memBlock_header {
 	BlockStatus blockStatus;
-	size_t size;
-	size_t prev_size;
+	int size;
+	int prev_size;
 };
 
 void printHeap();
 void traverseHeap();
-void *getBlockById(const size_t id);
+void *getBlockById(const int id);
 
-void *mem_alloc(const size_t size);
+void *mem_alloc(const int size);
 void mem_free(void *mem_block);
-void *mem_realloc(void *block, const size_t new_size);
+void *mem_realloc(void *block, const int new_size);
 

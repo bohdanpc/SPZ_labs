@@ -26,13 +26,13 @@ void initHeap() {
 	}
 }
 
-void *mem_alloc(const size_t size) {
+void *mem_alloc(const int size) {
 	initHeap();
 
 	bool isFound = false;
 	int prev_block_size = 0;
 	memBlock_header *curr_block = (memBlock_header*)heap;
-	size_t alignedSize = size;
+	int alignedSize = size;
 	if (alignedSize % BLOCK_ALIGNMENT != 0)
 	alignedSize += BLOCK_ALIGNMENT - alignedSize % BLOCK_ALIGNMENT;
 
@@ -55,8 +55,8 @@ void *mem_alloc(const size_t size) {
 		next_block->prev_size = alignedSize;
 		next_block->size = curr_block->size - alignedSize - sizeof(memBlock_header);
 	}
-	else if (curr_block->size == alignedSize + sizeof(memBlock_header)) //if free space equal to memHeader size
-		alignedSize += sizeof(memBlock_header);							//then there's no need to have block with size==0
+	else								 //if free space equal or less then memHeader size
+		alignedSize = curr_block->size;  //then there's no need to have block with size==0
 		
 	curr_block->size = alignedSize;
 	curr_block->blockStatus = BlockStatus::used;
@@ -105,8 +105,13 @@ void mem_free(void *block) {
 }
 
 
-void *mem_realloc(void *block, const size_t new_size) {
-	return nullptr;
+void *mem_realloc(void *block, const int new_size) {
+	void *new_block = mem_alloc(new_size);
+	if (new_block) {
+		mem_free(block);
+		return new_block;
+	}
+	return block;
 }
 
 
@@ -127,6 +132,7 @@ const std::string blockStatusToStr(const BlockStatus status) {
 }
 
 void traverseHeap() {
+	initHeap();
 	memBlock_header *curr_block = (memBlock_header*)heap;
 	int blockCount = 0;
 	int value = 0;
@@ -144,7 +150,7 @@ void traverseHeap() {
 	}
 }
 
-void *getBlockById(const size_t id) {
+void *getBlockById(const int id) {
 	memBlock_header *curr_block = (memBlock_header*)heap;
 	for (int i = 0; i < id; i++) {
 		if (&heap[HEAP_SIZE - 1] - (unsigned char*)(curr_block + 1) - curr_block->size + 1 > 0)
